@@ -8,18 +8,18 @@
             <label  class="info" horizontalAlignment="center" verticalAlignment="center" textWrap="true">
                 <span text="Add value after deductions" />
         </label>
-            <textField  editable textChange={onInputChange} bind:text={salary} keyboardType={'number'} hint={'Value after bills, etc.'}/>
+            <textField  editable="true"  bind:text={salary} keyboardType={'number'} hint={'Value after bills, etc.'}/>
     </stackLayout>
         <stackLayout >
             <label class="info" horizontalAlignment="center" verticalAlignment="center" textWrap="true">
                 <span text="Add value before deductions" />
         </label>
-            <textField editable keyboardType={'number'} bind:value={salary} hint={'Salary'}/>
-            <textField editable keyboardType={'number'} hint={'Subtract this'}/>
+            <textField editable="true" keyboardType={'number'} bind:value={salary} hint={'Salary'}/>
+            <textField editable="true" keyboardType={'number'} on:textChange={onInputChangeDebounced} hint={'Subtract this'}/>
             {#if !!numberOfSubtractInputs.length}
             <listView height='150' items={numberOfSubtractInputs} row='1'>
                 <Template let:item>
-                    <textField editable keyboardType={'number'} hint={'Also this'}/> 
+                    <textField editable="true" keyboardType={'number'} on:textChange={onInputChangeDebounced} hint={'Subtract this'}/>
                     <button text="rem" on:tap="{onRemoveAnother}" />
                 </Template>
             </listView>
@@ -33,14 +33,20 @@
 <script>
 import { Template } from 'svelte-native/components'
 import { totalAmount } from './Stores/stores.js'
+import debounce from 'lodash/debounce'
 
     let message = "Add your salary"
     let numberOfSubtractInputs = [] 
     let salary = 0;
-
-    function onInputChange(event) {
-        console.log('object', {event})
+let dupa = 0;
+    function onInputChange(e) { 
+        console.log('e.target.value', e.target)
     }
+    console.log('dupa', dupa)
+    const onInputChangeDebounced = debounce(e => {
+        console.log('e.targeerrt.value', e.object.text)
+  }, 3000)
+    
     function onAddAnother(){
         numberOfSubtractInputs = [...numberOfSubtractInputs,'x']
     }
