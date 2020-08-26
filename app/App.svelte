@@ -8,25 +8,27 @@
             <label  class="info" horizontalAlignment="center" verticalAlignment="center" textWrap="true">
                 <span text="Add value after deductions" />
         </label>
-            <textField  editable="true"  bind:text={salary} keyboardType={'number'} hint={'Value after bills, etc.'}/>
+            <textField  editable="true"  on:textChange={onSetSalary} keyboardType={'number'} hint={'Value after bills, etc.'}/>
     </stackLayout>
         <stackLayout >
             <label class="info" horizontalAlignment="center" verticalAlignment="center" textWrap="true">
                 <span text="Add value before deductions" />
         </label>
-            <textField editable="true" keyboardType={'number'} bind:value={salary} hint={'Salary'}/>
-            <textField editable="true" keyboardType={'number'} on:textChange={onInputChangeDebounced} hint={'Subtract this'}/>
-            {#if !!numberOfSubtractInputs.length}
-            <listView height='150' items={numberOfSubtractInputs} row='1'>
-                <Template let:item>
-                    <textField editable="true" keyboardType={'number'} on:textChange={onInputChangeDebounced} hint={'Subtract this'}/>
-                    <button text="rem" on:tap="{onRemoveAnother}" />
+            <textField editable="true" keyboardType={'number'} on:textChange={onSetSalary} hint={'Salary'}/>
+            <!-- <textField editable="true" keyboardType={'number'} on:textChange={onAddDeudction} hint={'Subtract this'}/> -->
+            
+            <listView height='150' items="{numberOfSubtractInputs}" on:itemTap={onItemTap} row='1'> 
+                <Template let:item> 
+                <label>
+                    <span text={item} />
+                </label>
+                <button text="rem" on:tap="{onRemoveAnother}" />
                 </Template>
             </listView>
-            {/if}
-            <button text="Another" on:tap="{onAddAnother}" />
+            <textField editable="true" keyboardType={'number'} on:textChange={onAddDeudction} hint={'Subtract this'}/>
+            <button text="Deduct" on:tap="{onDeduct}" />
         </stackLayout>
-        <button text="Start {salary}" on:tap="{onSubmit}" />
+        <button text="Start {parseFloat(salary).toFixed(2)}" on:tap="{onSubmit}" />
         </stackLayout>
 </page>
 
@@ -34,32 +36,43 @@
 import { Template } from 'svelte-native/components'
 import { totalAmount } from './Stores/stores.js'
 import debounce from 'lodash/debounce'
+import { closeModal } from 'svelte-native';
 
     let message = "Add your salary"
     let numberOfSubtractInputs = [] 
     let salary = 0;
-let dupa = 0;
-    function onInputChange(e) { 
-        console.log('e.target.value', e.target)
-    }
-    console.log('dupa', dupa)
-    const onInputChangeDebounced = debounce(e => {
-        console.log('e.targeerrt.value', e.object.text)
-  }, 3000)
-    
-    function onAddAnother(){
-        numberOfSubtractInputs = [...numberOfSubtractInputs,'x']
-    }
-    function onRemoveAnother(){
-        numberOfSubtractInputs.pop();
+    let tempDeduction = null;
 
+const onAddDeudction = debounce(e => {
+        console.log('e.targeerrt.value', e.object.text)
+        tempDeduction = parseFloat(e.object.text).toFixed(2);
+        console.log(tempDeduction, 'df')
+  }, 2000)
+        
+    const onSetSalary = debounce(e => {
+        salary = parseFloat(e.object.text).toFixed(2);
+    },2000)
+
+    const onItemTap = (event) => {console.log('event.index', event)}
+
+    const onDeduct = () => {
+        console.log('tempDeduction', tempDeduction)
+        console.log('numberOfSubtractInputs', numberOfSubtractInputs)
+        numberOfSubtractInputs = [...numberOfSubtractInputs,tempDeduction]
+        console.log('numberOfSubtractInputs after' , numberOfSubtractInputs)
+        salary -= tempDeduction;
+    }
+    const onRemoveAnother = (...args) => {
+        const value = parseFloat(e.object.text).toFixed(2);
+        console.log('salary,value', salary,value)
+        salary += value;
+        console.log('last salary', salary)
+        const last = numberOfSubtractInputs.pop();
+        console.log('object', object)
         numberOfSubtractInputs = numberOfSubtractInputs.length > 0 ? [...numberOfSubtractInputs] : [];
     
     }
-    function onTemplateSelect(item,index,items){
-        console.log('item', item)
-        console.log('index', index)
-    }
+
     function onSubmit() {
         totalAmount.set(salary)
         console.log('totalAmoddunt', $totalAmount)
