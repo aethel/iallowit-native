@@ -15,18 +15,18 @@
                 <span text="Add value before deductions" />
         </label>
             <textField editable="true" keyboardType={'number'} on:textChange={onSetSalary} hint={'Salary'}/>
-            <!-- <textField editable="true" keyboardType={'number'} on:textChange={onAddDeudction} hint={'Subtract this'}/> -->
+            <!-- <textField editable="true" keyboardType={'number'} on:textChange={onAddDeduction} hint={'Subtract this'}/> -->
             
             <listView height='150' items="{numberOfSubtractInputs}" on:itemTap={onItemTap} row='1'> 
                 <Template let:item> 
                 <label>
                     <span text={item} />
                 </label>
-                <button text="rem" on:tap="{onRemoveAnother}" />
+                <button text="rem" on:tap="{onRemove(item)}" />
                 </Template>
             </listView>
-            <textField editable="true" keyboardType={'number'} on:textChange={onAddDeudction} hint={'Subtract this'}/>
-            <button text="Deduct" on:tap="{onDeduct}" />
+            <textField required editable="true" keyboardType={'number'} bind:text="{tempDeduction}" on:textChange={onAddDeduction} hint={'Subtract this'}/>
+            <button text="Deduct" isEnabled={!!tempDeduction} on:tap="{onDeduct}" />
         </stackLayout>
         <button text="Start {parseFloat(salary).toFixed(2)}" on:tap="{onSubmit}" />
         </stackLayout>
@@ -43,9 +43,9 @@ import { closeModal } from 'svelte-native';
     let salary = 0;
     let tempDeduction = null;
 
-const onAddDeudction = debounce(e => {
-        console.log('e.targeerrt.value', e.object.text)
-        tempDeduction = parseFloat(e.object.text).toFixed(2);
+const onAddDeduction = debounce(e => {
+        console.log('e.addded', e.object.text)
+        tempDeduction = !!e.object.text ? parseFloat(e.object.text).toFixed(2) : 0;
         console.log(tempDeduction, 'df')
   }, 2000)
         
@@ -53,23 +53,23 @@ const onAddDeudction = debounce(e => {
         salary = parseFloat(e.object.text).toFixed(2);
     },2000)
 
-    const onItemTap = (event) => {console.log('event.index', event)}
+    const onItemTap = (event) => {console.log('event.index')}
 
     const onDeduct = () => {
-        console.log('tempDeduction', tempDeduction)
-        console.log('numberOfSubtractInputs', numberOfSubtractInputs)
         numberOfSubtractInputs = [...numberOfSubtractInputs,tempDeduction]
-        console.log('numberOfSubtractInputs after' , numberOfSubtractInputs)
         salary -= tempDeduction;
+        tempDeduction = 0;
     }
-    const onRemoveAnother = (...args) => {
-        const value = parseFloat(e.object.text).toFixed(2);
-        console.log('salary,value', salary,value)
-        salary += value;
-        console.log('last salary', salary)
-        const last = numberOfSubtractInputs.pop();
-        console.log('object', object)
-        numberOfSubtractInputs = numberOfSubtractInputs.length > 0 ? [...numberOfSubtractInputs] : [];
+    const onRemove = (item) => {
+        console.log(item)
+        const value = parseFloat(item).toFixed(2);
+        // numberOfSubtractInputs.findIndex()
+        // console.log('salary,value', salary,value)
+        // salary += value;
+        // console.log('last salary', salary)
+        // const last = numberOfSubtractInputs.pop();
+        // console.log('object', object)
+        // numberOfSubtractInputs = numberOfSubtractInputs.length > 0 ? [...numberOfSubtractInputs] : [];
     
     }
 
