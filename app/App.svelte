@@ -28,7 +28,7 @@
             <textField required editable="true" keyboardType={'number'} bind:text="{tempDeduction}" on:textChange={onAddDeduction} hint={'Subtract this'}/>
             <button text="Deduct" isEnabled={!!tempDeduction} on:tap="{onDeduct}" />
         </stackLayout>
-        <button text="Start {parseFloat(salary).toFixed(2)}" on:tap="{onSubmit}" />
+        <button text="Start {(salary).toLocaleString('de-DE',{ style: 'currency', currency: 'EUR' })}" on:tap="{onSubmit}" />
         </stackLayout>
 </page>
 
@@ -45,12 +45,12 @@ import { closeModal } from 'svelte-native';
 
 const onAddDeduction = debounce(e => {
         console.log('e.addded', e.object.text)
-        tempDeduction = !!e.object.text ? parseFloat(e.object.text).toFixed(2) : 0;
+        tempDeduction = !!e.object.text ? parseFloat(e.object.text) : 0;
         console.log(tempDeduction, 'df')
   }, 2000)
         
     const onSetSalary = debounce(e => {
-        salary = parseFloat(e.object.text).toFixed(2);
+        salary = parseFloat(e.object.text);
     },2000)
 
     const onItemTap = (event) => {console.log('event.index')}
@@ -62,15 +62,12 @@ const onAddDeduction = debounce(e => {
     }
     const onRemove = (item) => {
         console.log(item)
-        const value = parseFloat(item).toFixed(2);
-        // numberOfSubtractInputs.findIndex()
-        // console.log('salary,value', salary,value)
-        // salary += value;
-        // console.log('last salary', salary)
-        // const last = numberOfSubtractInputs.pop();
-        // console.log('object', object)
-        // numberOfSubtractInputs = numberOfSubtractInputs.length > 0 ? [...numberOfSubtractInputs] : [];
-    
+        console.log(numberOfSubtractInputs)
+        const newArr = numberOfSubtractInputs.filter(i => i !== item)
+        numberOfSubtractInputs = [...newArr]
+        console.log(newArr);
+        salary = parseFloat(+item + +salary);
+        console.log(salary, 'new salary');
     }
 
     function onSubmit() {
