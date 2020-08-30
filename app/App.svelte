@@ -28,21 +28,24 @@
             <textField required editable="true" keyboardType={'number'} bind:text="{tempDeduction}" on:textChange={onAddDeduction} hint={'Subtract this'}/>
             <button text="Deduct" isEnabled={!!tempDeduction} on:tap="{onDeduct}" />
         </stackLayout>
-        <button text="Start {(salary).toLocaleString('de-DE',{ style: 'currency', currency: 'EUR' })}" on:tap="{onSubmit}" />
+        <button text="Start {(salary).toLocaleString('de-DE',{ style: 'currency', currency: 'EUR' })}" on:tap="{() => onSubmit()}" />
         </stackLayout>
 </page>
 
 <script>
-import { Template } from 'svelte-native/components'
+import { Template,page } from 'svelte-native/components'
 import { totalAmount } from './Stores/stores.js'
 import debounce from 'lodash/debounce'
 import { closeModal } from 'svelte-native';
+import { navigate } from 'svelte-native'
+import  CalendarView  from './Components/CalendarView'
+
 
     let message = "Add your salary"
     let numberOfSubtractInputs = [] 
     let salary = 0;
     let tempDeduction = null;
-
+    let navTo = CalendarView; 
 const onAddDeduction = debounce(e => {
         console.log('e.addded', e.object.text)
         tempDeduction = !!e.object.text ? parseFloat(e.object.text) : 0;
@@ -69,13 +72,13 @@ const onAddDeduction = debounce(e => {
         salary = parseFloat(+item + +salary);
         console.log(salary, 'new salary');
     }
-
     function onSubmit() {
-        totalAmount.set(salary)
+        console.log('TYPEOF',CalendarView, typeof CalendarView)
+        totalAmount.set(salary);
         console.log('totalAmoddunt', $totalAmount)
+        navigate({ page: CalendarView, animated: true })
     }
 </script>
-
 <style>
     .info .fas {
         color: #3A53FF;
