@@ -11,7 +11,7 @@
 
   let daysInMonth = getDaysInMonth();
   let allowanceDays = [...new Array(daysInMonth)].map(()=> +$totalAmount / +daysInMonth);
-  console.log(allowanceDays);
+  const onItemTap = (event) => {console.log('EVENT', event); console.log('EVENT', event.index);}
 </script>
 
 <style>
@@ -22,10 +22,11 @@
   <actionBar title="I Allow It" />
   <dockLayout backgroundColor="yellow">
     <scrollView dock='top' backgroundColor="goldenrod">
-      <listView height='500' items={allowanceDays} backgroundColor="blue">
+      <listView height='500' on:itemTap='{onItemTap}' items={allowanceDays} backgroundColor="blue">
         <Template let:item >
           <label
-          width="60"
+          width="300"
+          height='100'
           backgroundColor="limegreen">
           <span text={parseFloat(item).toFixed(2)} />
         </label>
