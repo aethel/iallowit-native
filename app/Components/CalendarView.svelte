@@ -27,11 +27,12 @@
   allowanceDays = [newAllowance1, ...allowanceDays ]
   allowanceDays = [newAllowance2, ...allowanceDays ]
   let totalDeduction = null;
-  console.log(allowanceDays);
+  // console.log(allowanceDays);
   const onItemTap = (event) => {
-    console.log("EVENT", event);
-    console.log("EVENT", event.index);
-    showModal({page: EditDay,pops: {msg:'kaka'}})
+    // console.log("EVENT", event);
+    console.log("EVENT", allowanceDays[event.index]);
+    let day = allowanceDays[event.index];
+    showModal({page: EditDay,props: {day: day}})
   };
 </script>
 
