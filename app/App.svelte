@@ -47,9 +47,7 @@ import  CalendarView  from './Components/CalendarView'
     let tempDeduction = null;
     let navTo = CalendarView; 
 const onAddDeduction = debounce(e => {
-        console.log('e.addded', e.object.text)
         tempDeduction = !!e.object.text ? parseFloat(e.object.text) : 0;
-        console.log(tempDeduction, 'df')
   }, 2000)
         
     const onSetSalary = debounce(e => {
@@ -73,9 +71,7 @@ const onAddDeduction = debounce(e => {
         console.log(salary, 'new salary');
     }
     function onSubmit() {
-        console.log('TYPEOF',CalendarView, typeof CalendarView)
         totalAmount.set(salary);
-        console.log('totalAmoddunt', $totalAmount)
         navigate({ page: CalendarView, animated: true })
     }
 </script>

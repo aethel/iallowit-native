@@ -1,15 +1,59 @@
-    <script>
-        import { closeModal } from 'svelte-native';
-        import { totalAmount } from "../Stores/stores.js";
+<script>
+  import { closeModal } from "svelte-native";
+  import { monthlyBreakdown } from "../Stores/stores.js";
+  import debounce from "lodash/debounce";
+  import localStorage from "nativescript-localstorage";
 
-export let day;
-console.log(day, 'DAY');
-console.log(day.allowance, 'DAY1');
-console.log(day.deductions, 'DAY2');
+  // export let day;
+  export let index;
+  let add = false;
+  let tempDeduction = null;
+  let day = $monthlyBreakdown[index] || null;
+  const onAddDeduction = debounce((e) => {
+    tempDeduction = !!e.object.text ? parseFloat(e.object.text) : 0;
+  }, 2000);
+
+  const onDeduct = () => {
+    if(day) {
+      day.allowance = +day.allowance - tempDeduction;
+      day.deductions.push(+tempDeduction);
+      const newMonthlyBreakdown = $monthlyBreakdown.map((x, i) =>
+        i === index ? day : x
+      );
+      console.log(day);
+      monthlyBreakdown.set(newMonthlyBreakdown);
+      tempDeduction = 0;
+    }
+  };
+  const onCheckedChange = () => {
+    add = !add;
+    console.log(add);
+  };
+  const onClose = () => {
+    closeModal();
+  };
+  //     useLocalStorage(count, 'count');
+  // let count_value;
+  // 	const unsubscribe = count.subscribe(value => {
+  // 		count_value = value;
+  //         }
+  //     );
 </script>
-    <frame id="detail-page-frame">
-        <page>
-            <label text={parseFloat(day.allowance).toFixed(2)} />
-            <button text="closeg Modal" on:tap="{()=> closeModal()}" />
-        </page>
-    </frame>
+
+<frame id="detail-page-frame">
+  <page>
+    <stackLayout>
+      <switch bind:checked={add} on:checkedChange={onCheckedChange} />
+      <label text={parseFloat(day.allowance).toFixed(2)} />
+      <textField
+        required
+        editable="true"
+        keyboardType={'number'}
+        bind:text={tempDeduction}
+        on:textChange={onAddDeduction}
+        hint={'Subtract this'} />
+      <button text="Deduct" isEnabled={!!tempDeduction} on:tap={onDeduct} />
+      <button text="closeg Modal" on:tap={onClose} />
+    </stackLayout>
+  </page>
+</frame>

@@ -1,8 +1,10 @@
 <script>
   import { Template } from "svelte-native/components";
-  import { totalAmount } from "../Stores/stores.js";
+  import { totalAmount, monthlyBreakdown } from "../Stores/stores.js";
   // import debounce from 'lodash/debounce'
   import EditDay from './EditDay';
+  import localStorage from 'nativescript-localstorage';
+
   import { showModal, closeModal, goBack } from "svelte-native";
   const getDaysInMonth = () => {
     const m = new Date().getMonth();
@@ -26,13 +28,12 @@
   allowanceDays = [newAllowance, ...allowanceDays ]
   allowanceDays = [newAllowance1, ...allowanceDays ]
   allowanceDays = [newAllowance2, ...allowanceDays ]
+  localStorage.setItem('allowanceDays',allowanceDays);
+  monthlyBreakdown.set(allowanceDays)
   let totalDeduction = null;
-  // console.log(allowanceDays);
   const onItemTap = (event) => {
-    // console.log("EVENT", event);
-    console.log("EVENT", allowanceDays[event.index]);
     let day = allowanceDays[event.index];
-    showModal({page: EditDay,props: {day: day}})
+    showModal({page: EditDay,props: {day: day, index:event.index}})
   };
 </script>
 
@@ -47,13 +48,12 @@
       <listView
         height="500"
         on:itemTap={onItemTap}
-        items={allowanceDays}
+        items={$monthlyBreakdown}
         backgroundColor="blue">
         <Template let:item >
           <label width="300" height='100' backgroundColor="limegreen">
             <span text={parseFloat(item.allowance).toFixed(2)} />
             <!-- {#if item.deductions.length} -->
-            {console.log(item.deductions)}
               {#each item.deductions as deduction }
               <span text={`- ${deduction}`}/>
               {/each}
