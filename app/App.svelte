@@ -51,7 +51,7 @@ const onAddDeduction = debounce(e => {
   }, 2000)
         
     const onSetSalary = debounce(e => {
-        salary = parseFloat(e.object.text);
+        salary = parseFloat(e.object.text) || 0;
     },2000)
 
     const onItemTap = (event) => {console.log('event.index')}

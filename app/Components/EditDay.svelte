@@ -17,11 +17,12 @@
     if(day) {
       day.allowance = +day.allowance - tempDeduction;
       day.deductions.push(+tempDeduction);
-      const newMonthlyBreakdown = $monthlyBreakdown.map((x, i) =>
-        i === index ? day : x
-      );
-      console.log(day);
-      monthlyBreakdown.set(newMonthlyBreakdown);
+      // const newMonthlyBreakdown = $monthlyBreakdown.map((x, i) =>
+        // i === index ? day : x
+      // );
+      // console.log(day,'day');
+      // monthlyBreakdown.set([]);
+      // monthlyBreakdown.set(newMonthlyBreakdown);
       tempDeduction = 0;
     }
   };
@@ -30,7 +31,9 @@
     console.log(add);
   };
   const onClose = () => {
-    closeModal();
+    // console.log('index',index);
+    // console.log($monthlyBreakdown[index]);
+      closeModal(day);
   };
   //     useLocalStorage(count, 'count');
   // let count_value;

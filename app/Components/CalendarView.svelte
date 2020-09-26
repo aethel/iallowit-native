@@ -9,7 +9,7 @@
   const getDaysInMonth = () => {
     const m = new Date().getMonth();
     const y = new Date().getFullYear();
-    return new Date(y, m, 0).getDate();
+    return new Date(y, m+1, 0).getDate();
   };
   const dayInMonth = new Date().getDate();
   const allowanceObject = {
@@ -20,20 +20,22 @@
 
   let daysInMonth = getDaysInMonth();
   let allowanceDays = [...new Array(daysInMonth)].map(() => {
-    return { allowance: +$totalAmount / +daysInMonth, deductions: [], additions:[] };
+    return { allowance: parseInt($totalAmount,10) /parseInt(daysInMonth,10), deductions: [], additions:[] };
   });
-  let newAllowance = {...allowanceDays[1], deductions: [1,2,3]};
-  let newAllowance1 = {...allowanceDays[1], deductions: [1,3]};
-  let newAllowance2 = {...allowanceDays[1], deductions: [2,3]};
-  allowanceDays = [newAllowance, ...allowanceDays ]
-  allowanceDays = [newAllowance1, ...allowanceDays ]
-  allowanceDays = [newAllowance2, ...allowanceDays ]
-  localStorage.setItem('allowanceDays',allowanceDays);
   monthlyBreakdown.set(allowanceDays)
+
   let totalDeduction = null;
+  
+  const launchModal = async (index) => {
+    let day = allowanceDays[index];
+    let result = await showModal({page: EditDay,props: {day: day, index:index}});
+    console.log(result,'result');
+    // monthlyBreakdown.edit(index,result)
+  }
+  
   const onItemTap = (event) => {
-    let day = allowanceDays[event.index];
-    showModal({page: EditDay,props: {day: day, index:event.index}})
+    launchModal(event.index);
+    
   };
 </script>
 
@@ -46,21 +48,22 @@
   <dockLayout backgroundColor="yellow">
     <scrollView dock="top" backgroundColor="goldenrod">
       <listView
-        height="500"
-        on:itemTap={onItemTap}
-        items={$monthlyBreakdown}
-        backgroundColor="blue">
-        <Template let:item >
-          <label width="300" height='100' backgroundColor="limegreen">
-            <span text={parseFloat(item.allowance).toFixed(2)} />
-            <!-- {#if item.deductions.length} -->
-              {#each item.deductions as deduction }
-              <span text={`- ${deduction}`}/>
-              {/each}
-            <!-- {#if item.deductions.length}<span>additions</span>{/if} -->
-          </label>
-        </Template>
-      </listView>
+      height="500"
+      on:itemTap={onItemTap}
+      items={$monthlyBreakdown}
+      backgroundColor="blue">
+      <Template let:item >
+        {console.log(parseFloat(item.allowance).toFixed(2),'value')}
+        <label width="300" height='100' backgroundColor="limegreen" text={parseFloat(item.allowance).toFixed(2)}>
+          <!-- <span text={parseFloat(item.allowance).toFixed(2)} /> -->
+          <!-- {#if item.deductions.length} -->
+            {#each item.deductions as deduction }
+            <span text={`- ${deduction}`}/>
+            {/each}
+          <!-- {#if item.deductions.length}<span>additions</span>{/if} -->
+        </label>
+      </Template>
+    </listView>
     </scrollView>
     <button dock="bottom" text="Back" on:tap={goBack} />
   </dockLayout>
