@@ -25,17 +25,37 @@
   monthlyBreakdown.set(allowanceDays)
   $: allowances = $monthlyBreakdown;
   let totalDeduction = null;
-  
+
+  const updateAllowancesFromTodays = (arr) => {
+    const daysFromToday = arr.splice(dayInMonth);
+    const daysUntilToday = arr.splice(0,dayInMonth);
+    const sumOfPreviousAllowances = daysUntilToday.map(item => {
+            return item.allowance || 0;
+    }).reduce((acc,curr) => acc + curr);
+    const sumOfFutureAllowances = daysFromToday.map(item => {
+        return item.allowance || 0;
+}).reduce((acc,curr) => acc + curr);
+    const updatedAllowancesFromToday = daysFromToday.map(item => {
+        const allowance = (sumOfPreviousAllowances+sumOfFutureAllowances)/daysFromToday.length
+        return {...item, allowance }}); 
+        const newBreakdown = [...daysUntilToday, ...updatedAllowancesFromToday];  
+        // console.log('today', daysUntilToday);
+        // console.log('update', updatedAllowancesFromToday);
+        // console.log('new', newUpdate); 
+return newBreakdown;
+}
+
   const launchModal = async (index) => {
     let day = allowanceDays[index];
     let result = await showModal({page: EditDay,props: {day: day, index:index}});
-    console.log(result,'result');
     monthlyBreakdown.edit(index,result)
+    monthlyBreakdown.set(updateAllowancesFromTodays(allowances))
   }
   
   const onItemTap = (event) => {
-    launchModal(event.index);
-    
+    if ((event.index + 1) >= dayInMonth) {
+      launchModal(event.index);
+    }
   };
 </script>
 
