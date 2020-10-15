@@ -19,10 +19,12 @@
   };
 
   let daysInMonth = getDaysInMonth();
+  const localBreakdown = localStorage.getItem('breakdown');
   let allowanceDays = [...new Array(daysInMonth)].map(() => {
     return { allowance: parseInt($totalAmount,10) /parseInt(daysInMonth,10), deductions: [], additions:[] };
   });
-  monthlyBreakdown.set(allowanceDays)
+  localBreakdown ? monthlyBreakdown.set(JSON.parse(localBreakdown)):  monthlyBreakdown.set(allowanceDays)
+  console.log(JSON.parse(localBreakdown));
   $: allowances = $monthlyBreakdown;
   let totalDeduction = null;
 
@@ -49,7 +51,10 @@ return newBreakdown;
     let day = allowanceDays[index];
     let result = await showModal({page: EditDay,props: {day: day, index:index}});
     monthlyBreakdown.edit(index,result)
-    monthlyBreakdown.set(updateAllowancesFromTodays(allowances))
+    const newBreakdown = updateAllowancesFromTodays(allowances);
+    monthlyBreakdown.set(newBreakdown)
+    localStorage.setItem('breakdown', JSON.stringify(newBreakdown))
+    console.log(localStorage.getItem('breakdown'));
   }
   
   const onItemTap = (event) => {
