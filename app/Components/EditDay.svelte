@@ -1,8 +1,6 @@
 <script>
   import { closeModal } from "svelte-native";
-  import { monthlyBreakdown, get } from "../Stores/stores.js";
   import debounce from "lodash/debounce";
-  import localStorage from "nativescript-localstorage";
 
   // export let day;
   export let index;
@@ -26,16 +24,8 @@
     console.log(add);
   };
   const onClose = () => {
-    // console.log('index',index);
-    // console.log($monthlyBreakdown[index]);
       closeModal(day);
   };
-  //     useLocalStorage(count, 'count');
-  // let count_value;
-  // 	const unsubscribe = count.subscribe(value => {
-  // 		count_value = value;
-  //         }
-  //     );
 </script>
 
 <frame id="detail-page-frame">

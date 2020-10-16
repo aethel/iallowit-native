@@ -11,30 +11,19 @@
     const y = new Date().getFullYear();
     return new Date(y, m + 1, 0).getDate();
   };
-  const dayInMonth = new Date().getDate();
+  const date = new Date();
+  const dayInMonth = date.getDate();
+  const dayInMonthPlusOne = new Date(date.getTime() + 86400000).getDate()
+;
+
   const allowanceObject = {
     allowance: null,
     deductions: [],
     additions: [],
   };
-
-  let daysInMonth = getDaysInMonth();
-  const localBreakdown = localStorage.getItem("breakdown");
-  let allowanceDays = [...new Array(daysInMonth)].map(() => {
-    return {
-      allowance: parseInt($totalAmount, 10) / parseInt(daysInMonth, 10),
-      deductions: [],
-      additions: [],
-    };
-  });
-  localBreakdown
-    ? monthlyBreakdown.set(JSON.parse(localBreakdown))
-    : monthlyBreakdown.set(allowanceDays);
-  $: allowances = $monthlyBreakdown;
-  let totalDeduction = null;
-
-  const updateAllowancesFromTodays = (arr) => {
-    const daysFromToday = arr.splice(dayInMonth);
+  const updateAllowancesFromTodays = (arr, manual = false) => {
+    // should update one index before
+    const daysFromToday = manual ? arr.splice(dayInMonth) : arr.splice(dayInMonth);
     const daysUntilToday = arr.splice(0, dayInMonth);
     const sumOfPreviousAllowances = daysUntilToday
       .map((item) => {
@@ -53,17 +42,40 @@
       return { ...item, allowance };
     });
     const newBreakdown = [...daysUntilToday, ...updatedAllowancesFromToday];
+    console.log(newBreakdown);
     return newBreakdown;
   };
 
+  let daysInMonth = getDaysInMonth();
+  const localBreakdown = localStorage.getItem("breakdown");
+  let allowanceDays = [...new Array(daysInMonth)].map(() => {
+    return {
+      allowance: parseInt($totalAmount, 10) / parseInt(daysInMonth, 10),
+      deductions: [],
+      additions: [],
+    };
+  });
+  const automaticallyUpdatedAllowances = updateAllowancesFromTodays(allowanceDays);
+  localBreakdown
+    ? monthlyBreakdown.set(JSON.parse(localBreakdown))
+    : monthlyBreakdown.set(automaticallyUpdatedAllowances);
+  $: allowances = $monthlyBreakdown;
+  let totalDeduction = null;
+
+  
+
   const launchModal = async (index) => {
-    let day = allowanceDays[index];
+    let day = localBreakdown
+    ? JSON.parse(localBreakdown)[index]
+    : automaticallyUpdatedAllowances[index];
     let result = await showModal({
       page: EditDay,
       props: { day: day, index: index },
     });
     monthlyBreakdown.edit(index, result);
-    const newBreakdown = updateAllowancesFromTodays(allowances);
+    console.log('breakdown', $monthlyBreakdown);
+    console.log('allows', allowances);
+    const newBreakdown = updateAllowancesFromTodays($monthlyBreakdown,true);
     monthlyBreakdown.set(newBreakdown);
     localStorage.setItem("breakdown", JSON.stringify(newBreakdown));
   };
